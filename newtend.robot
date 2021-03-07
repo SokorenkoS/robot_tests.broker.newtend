@@ -254,8 +254,8 @@ Login
     \   ${plan_item_unit}=        Get From Dictionary      ${plan_items_block[${I}].unit}  name
 #    \   ${plan_itemUnit_normal}=    key_by_value  ${plan_item_unit}
     \   ${add_item_btn}=          Get Webelement  xpath=//button[@ng-click="addField()"]
-#    \   Focus    ${add_item_btn}
-#    \   Sleep   10
+    \   Focus    ${add_item_btn}
+    \   Sleep   10
     \   Click Element    ${add_item_btn}
     \   Sleep    1
     \   Input Text  id=itemDescription0      ${plan_item_description}

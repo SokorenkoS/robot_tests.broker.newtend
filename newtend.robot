@@ -15,7 +15,7 @@ ${locator.view_title}                id=view-tender-title
 ${locator.description}               id=tender-description
 ${locator.view_description}          id=view-tender-description
 ${locator.edit.description}          name=tenderDescription
-${locator.value.amount}              id=budget
+${locator.value.amount}              xpath=//*[@id="budget"]
 ${locator.view_value_amount}         id=view-tender-value
 ${locator.minimalStep.amount}        xpath=//div[@ng-bind="tender.minimalStep.amount"]
 ${locator.tenderId}                  xpath=//a[@class="ng-binding ng-scope"]
@@ -143,6 +143,8 @@ Login
 #    Click Element   id=create-menu
 #    Sleep   1
 #    Click Element   xpath=//a[@href="/opc/provider/plans/create"]
+    Focus    xpath=//a[@ng-click="vm.setLanguage('uk')"]
+    Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
     Go To   https://dev23.newtend.com/opc/provider/plans/create
     Wait Until Page Contains Element    id=plan-description     5
 
@@ -187,6 +189,8 @@ Login
 #    Input Text  id=budget   ${total_budget_amountNet_string}
     ${total_budget_amount_string}=   convert_budget    ${total_budget_amount}
     # Filling the fields
+    Focus   xpath=//*[@id="budget"]
+    Click Element   xpath=//*[@id="budget"]
     Input Text  id=budget   ${total_budget_amount_string}
     ${budget_currency_dropdown}=    Get Webelement  id=currency
     Select From List By Label   ${budget_currency_dropdown}     ${total_budget_currency}
@@ -243,13 +247,15 @@ Login
     ${plan_items_block}=         Get From Dictionary   ${ARGUMENTS[1].data}   items
     ${items_len}=   Get Length  ${plan_items_block}
     :FOR   ${I}   IN RANGE  ${items_len}
+    \   Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
     \   ${plan_item_description}=    Get From Dictionary   ${plan_items_block[${I}]}    description
     \   ${plan_item_quantity_raw}=   Get From Dictionary   ${plan_items_block[${I}]}    quantity
     \   ${plan_item_quantity_string}=   convert_budget     ${plan_item_quantity_raw}
     \   ${plan_item_unit}=        Get From Dictionary      ${plan_items_block[${I}].unit}  name
 #    \   ${plan_itemUnit_normal}=    key_by_value  ${plan_item_unit}
     \   ${add_item_btn}=          Get Webelement  xpath=//button[@ng-click="addField()"]
-    \   Focus    ${add_item_btn}
+#    \   Focus    ${add_item_btn}
+#    \   Sleep   10
     \   Click Element    ${add_item_btn}
     \   Sleep    1
     \   Input Text  id=itemDescription0      ${plan_item_description}
@@ -282,7 +288,6 @@ Login
     \   Input Text    ${item_deliveryDate_field}    ${item_deliveryEndDate}
 
     Click Element     id=submit-btn
-
     Wait Until Page Contains Element    id=planID   10
 
     ${tender_uaid}=   Get Text  id=planID
@@ -338,6 +343,7 @@ set_dk_dkpp
   Input Text        ${search_field}   ${tender_uaid}
   Click Element     xpath=//button[@ng-click="search()"]
   Sleep     30
+  Click Element     xpath=//button[@ng-click="search()"]
   Wait Until Page Contains Element    xpath=//a[@class="row tender-info ng-scope"]    10
 
 #  : FOR   ${INDEX}   IN RANGE    1    30
@@ -345,7 +351,6 @@ set_dk_dkpp
 #  \   Wait Until Page Contains Element    xpath=//a[@class="row tender-info ng-scope"]    10
 #  \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="row tender-info ng-scope"]
 #  \   Exit For Loop If   '${count}' == '0'
-
 
 
   ${plan_raw}=  Get Webelement   xpath=//a[@class="row tender-info ng-scope"]/..//span[contains(text(), '${tender_uaid}')]
@@ -426,7 +431,6 @@ set_dk_dkpp
   ${cause}=        Run Keyword If  '${procurementMethodType}' == 'negotiation'   Get From Dictionary   ${ARGUMENTS[1].data}   cause
   ${cause_descr}=  Run Keyword If  '${procurementMethodType}' == 'negotiation'   Get From Dictionary   ${ARGUMENTS[1].data}   causeDescription
 
-
     # :TODO 'Create tender' block need to be refactored in future
 #  Sleep     3
 #  Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
@@ -442,9 +446,9 @@ set_dk_dkpp
 #  ${procedures_dropdown}=   Get Webelement  xpath=//select[@name="tenderProcedure"]
 
 #  Run Keyword If   '${procurementMethodType}' == 'reporting'          Click Element   xpath=//md-option[@value="reporting"]
-  Run Keyword If   '${procurementMethodType}' == 'negotiation'        Click Element   xpath=//md-option[@value="negotiation"]
-  Run Keyword If   '${procurementMethodType}' == 'negotiation'        Sleep   2
-  Run Keyword If   '${procurementMethodType}' == 'negotiation'        Click Element   xpath=//md-radio-button[@value="singlelot"]
+#  Run Keyword If   '${procurementMethodType}' == 'negotiation'        Click Element   xpath=//md-option[@value="negotiation"]
+#  Run Keyword If   '${procurementMethodType}' == 'negotiation'        Sleep   2
+#  Run Keyword If   '${procurementMethodType}' == 'negotiation'        Click Element   xpath=//md-radio-button[@value="singlelot"]
   Run Keyword If   '${procurementMethodType}' == 'aboveThresholdUA'   Click Element   xpath=//md-option[@value="aboveThresholdUA"]
   Run Keyword If   '${procurementMethodType}' == 'aboveThresholdEU'   Click Element   xpath=//md-option[@value="aboveThresholdEU"]
   Sleep     2
@@ -456,13 +460,13 @@ set_dk_dkpp
   # Direct navigating to Lotless belowUA creation' page
   Run Keyword If   '${procurementMethodType}' == 'belowThreshold'   Go To     https://dev23.newtend.com/opc/provider/create-tender/singlelot/belowThreshold/tender/
   Run Keyword If   '${procurementMethodType}' == 'reporting'        Go To     https://dev23.newtend.com/opc/provider/create-tender/singlelot/reporting/tender/
+  Run Keyword If   '${procurementMethodType}' == 'negotiation'        Go To     https://dev23.newtend.com/opc/provider/create-tender/singlelot/negotiation/tender/
 
   Wait Until Page Contains Element  id=tender-title     5
 
   # Getting Data to fill inside the tender
   ${title}=         Get From Dictionary   ${ARGUMENTS[1].data}               title
   ${description}=   Get From Dictionary   ${ARGUMENTS[1].data}               description
-
   ${items}=         Get From Dictionary   ${ARGUMENTS[1].data}               items
 
 # Input fields tender
@@ -587,6 +591,8 @@ Add lots
   \   Run Keyword If    '${procurementMethodType}' in ['defense', 'aboveThresholdEU']    Input Text    id=title_en${INDEX}     ${lots_title_en}
   \   Input Text    id=description${INDEX}  ${lots_description}
   \   Run Keyword If    '${procurementMethodType}' in ['defense', 'aboveThresholdEU']    Input Text    id=description_en${INDEX}     ${lots_description_en}
+  \   Focus     xpath=//*[@id="budget"]
+  \   Click Element     xpath=//*[@id="budget"]
   \   Input Text    id=budget${INDEX}       ${new_lots_value}
   \   Input Text    id=step${INDEX}         ${new_lots_step}
   \   Run Keyword If    ${INDEX} < ${NUMBER_OF_LOTS} - 1   add_cross_press
@@ -701,6 +707,8 @@ Lot Dict
   \   ${deliverydate_end_date}=             Get From Dictionary       ${items[${INDEX}].deliveryDate}      endDate
 ##  === Seems to be working -^- Loop for getting the values from Dictionary ===
   # Add item main info
+  \   Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
+  \   Sleep     3
   \   ${measure_list}=      Get Webelements     id=measure-list
   \   Click Element         ${measure_list[-1]}
   \   ${measure_name}=      Get Webelements   xpath=//a[@id="measure-list"]/..//a[contains(text(), '${unit_name}')]

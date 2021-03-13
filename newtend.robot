@@ -101,7 +101,7 @@ ${locator.view.procuringEntity.name}    xpath=//div[@class="block-info__text blo
   # Change Language to Ukr in the UI
   Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
   Sleep     3
-
+  Execute Javascript    window.AUTOTEST_MODE = true
 
 Login
   [ARGUMENTS]   @{ARGUMENTS}
@@ -143,8 +143,8 @@ Login
 #    Click Element   id=create-menu
 #    Sleep   1
 #    Click Element   xpath=//a[@href="/opc/provider/plans/create"]
-    Focus    xpath=//a[@ng-click="vm.setLanguage('uk')"]
-    Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
+#    Focus    xpath=//a[@ng-click="vm.setLanguage('uk')"]
+#    Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
     Go To   https://dev23.newtend.com/opc/provider/plans/create
     Wait Until Page Contains Element    id=plan-description     5
 
@@ -247,7 +247,7 @@ Login
     ${plan_items_block}=         Get From Dictionary   ${ARGUMENTS[1].data}   items
     ${items_len}=   Get Length  ${plan_items_block}
     :FOR   ${I}   IN RANGE  ${items_len}
-    \   Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
+#    \   Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
     \   ${plan_item_description}=    Get From Dictionary   ${plan_items_block[${I}]}    description
     \   ${plan_item_quantity_raw}=   Get From Dictionary   ${plan_items_block[${I}]}    quantity
     \   ${plan_item_quantity_string}=   convert_budget     ${plan_item_quantity_raw}
@@ -261,7 +261,7 @@ Login
     \   Input Text  id=itemDescription0      ${plan_item_description}
     \   Input Text  id=quantity0             ${plan_item_quantity_string}
     \   ${measure_list}=    Get Webelement   id=measure-list
-    \   Focus   ${measure_list}
+    \   Focus   id=measure-list
     \   Click Element       ${measure_list}
     \   ${measure_name}=    Get Webelements   xpath=//a[@id="measure-list"]/..//a[contains(text(), '${plan_item_unit}')]
     \   Focus   ${measure_name[-1]}
@@ -288,10 +288,14 @@ Login
     \   Input Text    ${item_deliveryDate_field}    ${item_deliveryEndDate}
 
     Click Element     id=submit-btn
-    Wait Until Page Contains Element    id=planID   10
+    Wait Until Page Contains Element    id=planID   20
 
     ${tender_uaid}=   Get Text  id=planID
     [Return]  ${tender_uaid}
+
+    Execute Javascript    window.AUTOTEST_MODE = true
+    Wait Until Page Contains Element    id=sign-tender-btn   20
+    Click Element     id=sign-tender-btn
 
   # ========= Click on the "Publish" button ========================================================
     #${publish_plan}=     Get Webelement   xpath=//button[@ng-click="publish(plan)"]
@@ -356,16 +360,12 @@ set_dk_dkpp
   ${plan_raw}=  Get Webelement   xpath=//a[@class="row tender-info ng-scope"]/..//span[contains(text(), '${tender_uaid}')]
   Click Element     ${plan_raw}
 #========================================
-
-
-
 #   Click Element                      id=no-docs-btn
 #  : FOR   ${INDEX}   IN RANGE    1    30
 #  \   Log To Console   .   no_newline=true
 #  \   Sleep     3
 #  \   ${count}=   Get Matching Xpath Count   xpath=//div[@class="modal-body ng-binding"]
 #  \   Exit For Loop If   '${count}' == '0'
-
 
 Отримати інформацію із плану
   [Arguments]   @{ARGUMENTS}
@@ -382,7 +382,6 @@ set_dk_dkpp
   ${plan_status_raw}=   Get Text   xpath=//span[@class="status ng-binding"]
   ${plan_status}=   convert_to_newtend_normal   ${plan_status_raw}
   [Return]     ${plan_status}
-
 
 Внести зміни в план
   [Arguments]   @{ARGUMENTS}
@@ -411,7 +410,8 @@ set_dk_dkpp
   [Arguments]   ${field_description}
   Log To Console    We are working on this process!
 
-
+Додати предмет закупівлі в план
+  [Arguments]   ${username}     @{ARGUMENTS}
 
 Створити тендер
   [Arguments]  @{ARGUMENTS}
@@ -707,9 +707,10 @@ Lot Dict
   \   ${deliverydate_end_date}=             Get From Dictionary       ${items[${INDEX}].deliveryDate}      endDate
 ##  === Seems to be working -^- Loop for getting the values from Dictionary ===
   # Add item main info
-  \   Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
+#  \   Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
   \   Sleep     3
   \   ${measure_list}=      Get Webelements     id=measure-list
+  \   Focus   id=measure-list
   \   Click Element         ${measure_list[-1]}
   \   ${measure_name}=      Get Webelements   xpath=//a[@id="measure-list"]/..//a[contains(text(), '${unit_name}')]
   \   Click Element         ${measure_name[-1]}
@@ -838,8 +839,6 @@ Fill The Delivery Fields
   Click Element        xpath=//button[@ng-click="vm.save()"]
   Sleep     4
 
-
-
 Завантажити документ
   [Arguments]  @{ARGUMENTS}
   [Documentation]   Uploading document for repoting
@@ -925,7 +924,6 @@ Fill The Delivery Fields
   \   ${count}=   Get Matching Xpath Count   xpath=//button[@ng-click="upload()"]
   \   Exit For Loop If   '${count}' == '0'
 
-
 Створити постачальника, додати документацію і підтвердити його
   [Arguments]   @{ARGUMENTS}
   [Documentation]   Adding user into reporting procedure
@@ -1004,7 +1002,6 @@ Fill The Delivery Fields
   \   ${count}=   Get Matching Xpath Count   xpath=//button[@ng-click="accept()"]
   \   Exit For Loop If   '${count}' == '0'
 
-
 Підтвердити підписання контракту
   [Arguments]   @{ARGUMENTS}
   [Documentation]   For Reporting procedure flow, pressing finish btn in Trades tab
@@ -1042,7 +1039,6 @@ Fill The Delivery Fields
   \   ${count}=   Get Matching Xpath Count   xpath=//form[@name="closeBidsForm"]
   \   Exit For Loop If   '${count}' < '1'
   Sleep     2
-
 
 Подати скаргу
   [Arguments]  @{ARGUMENTS}
@@ -1162,7 +1158,6 @@ Fill The Delivery Fields
 #  ${contr_status}=   Get Text   xpath=//span[@ng-if="vm.award.status === 'active'"]
   ${status}=    convert_to_newtend_normal   ${contr_status}
   [Return]  ${status}
-
 
 отримати інформацію про title
   Click Element     xpath=//a[@ui-sref="tenderView.overview"]

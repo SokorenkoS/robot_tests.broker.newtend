@@ -20,6 +20,19 @@ def newtend_date_picker_index(isodate):
 
 def update_data_for_newtend(tender_data):
     tender_data.data.procuringEntity['name'] = u"openprocurement"
+    tender_data.data.procuringEntity.identifier['id'] = u"00037256"
+    tender_data.data.procuringEntity.identifier['legalName'] = u"openprocurement"
+    tender_data.data.procuringEntity.address['postalCode'] = u"01220"
+    tender_data.data.procuringEntity.address['region'] = u"Київська область"
+    tender_data.data.procuringEntity.address['locality'] = u"м.Київ"
+    tender_data.data.procuringEntity.address['streetAddress'] = u"вул. Банкова, 11, корпус 1"
+#    tender_data['data']['procuringEntity']['name'] = u'u_Owner'
+#    tender_data['data']['procuringEntity']['identifier']['id'] = u'00000701'
+#    tender_data['data']['procuringEntity']['identifier']['legalName'] = u'u_Owner'
+#    tender_data['data']['procuringEntity']['address']['postalCode'] = u'11223'
+#    tender_data['data']['procuringEntity']['address']['region'] = u'Івано-Франківська область'
+#    tender_data['data']['procuringEntity']['address']['locality'] = u'м.Київ'
+#    tender_data['data']['procuringEntity']['address']['streetAddress'] = u'Вулиця111'
     return tender_data
 
 

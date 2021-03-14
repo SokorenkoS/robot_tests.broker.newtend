@@ -111,7 +111,7 @@ Login
   Wait Until Page Contains Element   ${locator.login_btn}   20
   Click Element   ${locator.login_btn}
   Sleep     2
-  Wait Until Page Contains Element  ${locator.login}    10
+  Wait Until Page Contains Element  ${locator.login}    20
   Click Element   ${locator.login}
   Input text   ${locator.login}      ${USERS.users['${ARGUMENTS[0]}'].login}
   Input text   ${locator.password}   ${USERS.users['${ARGUMENTS[0]}'].password}
@@ -262,6 +262,8 @@ Login
     \   Input Text  id=quantity0             ${plan_item_quantity_string}
     \   ${measure_list}=    Get Webelement   id=measure-list
     \   Focus   id=measure-list
+#    \   Focus   xpath=//*[@id="quantity-${I}"]
+#    \   Focus   xpath=//button[contains(text(),'Додати Умови оплати *')]
     \   Click Element       ${measure_list}
     \   ${measure_name}=    Get Webelements   xpath=//a[@id="measure-list"]/..//a[contains(text(), '${plan_item_unit}')]
     \   Focus   ${measure_name[-1]}
@@ -288,7 +290,8 @@ Login
     \   Input Text    ${item_deliveryDate_field}    ${item_deliveryEndDate}
 
     Click Element     id=submit-btn
-    Wait Until Page Contains Element    id=planID   20
+    Sleep   20
+    Wait Until Page Contains Element    id=planID   10
 
     ${tender_uaid}=   Get Text  id=planID
     [Return]  ${tender_uaid}
@@ -457,7 +460,7 @@ set_dk_dkpp
 #  Run Keyword If   '${procurementMethodType}' in ['reporting', 'negotiation', 'defense', 'aboveThresholdEU', 'aboveThresholdUA']  Click Element     xpath=//button[@ng-click="vm.createTender(vm.tenderProcedure, vm.tenderLots)"]
   Run Keyword If   '${procurementMethodType}' in ['reporting', 'negotiation', 'defense', 'aboveThresholdEU', 'aboveThresholdUA']  Sleep     7
 
-  # Direct navigating to Lotless belowUA creation' page
+# Direct navigating to Lotless belowUA creation' page
   Run Keyword If   '${procurementMethodType}' == 'belowThreshold'   Go To     https://dev23.newtend.com/opc/provider/create-tender/singlelot/belowThreshold/tender/
   Run Keyword If   '${procurementMethodType}' == 'reporting'        Go To     https://dev23.newtend.com/opc/provider/create-tender/singlelot/reporting/tender/
   Run Keyword If   '${procurementMethodType}' == 'negotiation'        Go To     https://dev23.newtend.com/opc/provider/create-tender/singlelot/negotiation/tender/
@@ -502,11 +505,17 @@ set_dk_dkpp
   Run Keyword If   '${procurementMethodType}' in ['belowThreshold']    Input Text   id=step     ${minimalStep}
 
 
-
   # Filling the Main Procurement category
   ${procurementCategory}=           Run Keyword If   '${procurementMethodType}' in ['belowThreshold']   Get From Dictionary   ${ARGUMENTS[1].data}   mainProcurementCategory
   ${procurementCategory_field}=     Run Keyword If   '${procurementMethodType}' in ['belowThreshold']   Get Webelement        id=mainProcurementCategory
   Run Keyword If   '${procurementMethodType}' in ['belowThreshold']   Select From List By Value   ${procurementCategory_field}   ${procurementCategory}
+
+# ---- Умови оплати ------
+#  Run Keyword If   '${procurementMethodType}' in ['belowThreshold']   Wait Until Page Contains Element   xpath=//button[@class="btn btn-sm btn-info ng-binding ng-scope"|contains(text(),'Додати Умови оплати *')]   10
+#  Run Keyword If   '${procurementMethodType}' in ['belowThreshold']   Focus    xpath=//button[@class="btn btn-sm btn-info ng-binding ng-scope"]
+#  Run Keyword If   '${procurementMethodType}' in ['belowThreshold']   Click element    xpath=//button[@class="btn btn-sm btn-info ng-binding ng-scope"]
+  Run Keyword If   '${procurementMethodType}' in ['belowThreshold']   Click element    xpath=//button[contains(text(),'Додати Умови оплати *')]
+
 
 #  Run Keyword If    '${TENDER_MEAT}' != 'False'    Add meats to tender   ${ARGUMENTS[1]}
 #  Run Keyword If    '${LOT_MEAT}' != 'False'       Add meats to lot      ${ARGUMENTS[1]}
@@ -545,6 +554,7 @@ set_dk_dkpp
   ${tenderingEnd_date_minutes}=  Run Keyword If    '${procurementMethodType}' in ['belowThreshold', 'defense', 'aboveThresholdEU', 'aboveThresholdUA']   Get Webelements   xpath=//label[@for="input-date-tender-tenderPeriod-endDate"]/..//input[@ng-change="updateMinutes()"]
   Run Keyword If   '${procurementMethodType}' in ['belowThreshold', 'defense', 'aboveThresholdEU', 'aboveThresholdUA']   Input Text    ${tenderingEnd_date_minutes[-1]}     ${tenderEnd_Minutes}
   Sleep     2
+
 
 
 # Save
@@ -710,7 +720,8 @@ Lot Dict
 #  \   Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
   \   Sleep     3
   \   ${measure_list}=      Get Webelements     id=measure-list
-  \   Focus   id=measure-list
+  \   Focus     id=measure-list
+  \   Focus     xpath=//*[@id="quantity-${INDEX}"]
   \   Click Element         ${measure_list[-1]}
   \   ${measure_name}=      Get Webelements   xpath=//a[@id="measure-list"]/..//a[contains(text(), '${unit_name}')]
   \   Click Element         ${measure_name[-1]}
@@ -721,6 +732,8 @@ Lot Dict
 
 # Set CPV
   \   Wait Until Page Contains Element   xpath=//input[contains(@id,'classifier-cpv-')]   5
+  \   Focus                              id=classifier-cpv-${INDEX}
+  \   Focus                              xpath=//input[contains(@id,'classifier-cpv-')]
   \   Click Element                      xpath=//input[contains(@id,'classifier-cpv-')]
   \   Click Element                      id=classifier-cpv-${INDEX}
 
@@ -1780,6 +1793,9 @@ Edit lot step
   ...      ${ARGUMENTS[1]} == ${TENDER_UAID}
   Reload Page
   Sleep     5
+
+Подати цінову пропозицію
+  [Arguments]  @{ARGUMENTS}
 
 отримати інформацію про QUESTIONS[0].title
   Wait Until Page Contains Element   xpath=//span[contains(text(), "Уточнения")]   20
